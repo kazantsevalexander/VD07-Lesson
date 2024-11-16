@@ -18,14 +18,17 @@ def register():
 
     form = RegistrationForm()
     if form.validate_on_submit():
+        # Хэширование пароля
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        # Сохранение пользователя
         user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
-        flash('Вы успешно зарегистрировались', 'success')
+        flash('Вы успешно зарегистрировались!', 'success')
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -34,19 +37,20 @@ def login():
         return redirect(url_for('home'))
 
     form = LoginForm()
-
-    # Если запрос GET и пользователь уже вводил логин ранее
-    username = request.args.get('username', '')
-
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.email.data).first()  # Проверка по имени пользователя
+        # Поиск пользователя в базе данных по email
+        user = User.query.filter_by(email=form.email.data).first()
+        # Проверка пароля
         if user and bcrypt.check_password_hash(user.password, form.password.data):
+            # Авторизация пользователя
             login_user(user, remember=form.remember.data)
+            flash('Вы успешно вошли!', 'success')
             return redirect(url_for('home'))
         else:
-            flash('Введены неверные данные', 'danger')
+            flash('Неверный email или пароль.', 'danger')
 
-    return render_template('login.html', form=form, username=username)
+    return render_template('login.html', form=form)
+
 
 
 @app.route('/logout')
@@ -61,17 +65,15 @@ def account():
     return render_template('account.html', user=current_user)
 
 
-
 @app.route('/account/edit', methods=['GET', 'POST'])
-@login_required
 def edit_account():
     form = EditProfileForm()
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.email = form.email.data
         if form.password.data:
-            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-            current_user.password = hashed_password
+            password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            current_user.password = password
 
         db.session.commit()
         flash('Ваш профиль успешно обновлен!', 'success')
