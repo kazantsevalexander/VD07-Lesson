@@ -1,9 +1,27 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Home
+    Главная страница
 {% endblock %}
 
 {% block content %}
-    <h1>Добро пожаловать на домашнюю страницу</h1>
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Добро пожаловать!</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead text-secondary">
+                        Добро пожаловать на наш сайт! Мы рады видеть вас здесь. Изучите возможности и начинайте пользоваться прямо сейчас.
+                    </p>
+                    <a href="{{ url_for('account') }}" class="btn btn-primary btn-lg mt-3">
+                        Перейти в профиль
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

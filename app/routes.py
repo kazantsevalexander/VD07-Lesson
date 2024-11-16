@@ -34,15 +34,19 @@ def login():
         return redirect(url_for('home'))
 
     form = LoginForm()
+
+    # Если запрос GET и пользователь уже вводил логин ранее
+    username = request.args.get('username', '')
+
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(username=form.email.data).first()  # Проверка по имени пользователя
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             return redirect(url_for('home'))
         else:
             flash('Введены неверные данные', 'danger')
 
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, username=username)
 
 
 @app.route('/logout')
